@@ -1,0 +1,44 @@
+version: '3'
+
+# docker volume create --name data -d local
+# Docker build based on below post, thanks for sharing
+# https://medium.com/bitcraft/docker-composing-a-python-3-flask-app-line-by-line-93b721105777
+# http://laradock.io/
+
+services:
+  flask:
+    image: webapp-flask
+    build:
+      context: ./flask
+      args:
+        - APP_CODE_PATH_HOST
+        - FLASK_APP
+    volumes:
+      - ${APP_CODE_PATH_HOST}:/app
+  nginx:
+    image: webapp-nginx
+    build:
+      context: ./nginx
+    volumes:
+      - ${NGINX_SSL_PATH}:/etc/nginx/ssl
+      - ${NGINX_HOST_LOG_PATH}:/var/log/nginx
+      - ${NGINX_SITES_PATH}:/etc/nginx/sites-available
+    ports:
+      - "${NGINX_HOST_HTTP_PORT}:80"
+      - "${NGINX_HOST_HTTPS_PORT}:443"
+    depends_on:
+      - flask
+  postgres:
+      build: ./postgres
+      volumes:
+        - data:/var/lib/postgresql/data
+        - ${POSTGRES_ENTRYPOINT_INITDB}:/docker-entrypoint-initdb.d
+      ports:
+        - "${POSTGRES_PORT}:5432"
+      environment:
+        - POSTGRES_DB=${POSTGRES_DB}
+        - POSTGRES_USER=${POSTGRES_USER}
+        - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+volumes:
+  data:
+    external: true
