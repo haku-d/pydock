@@ -25,6 +25,15 @@ RUN pip install --upgrade pip \
 ARG FLASK_APP
 ENV FLASK_APP ${FLASK_APP}
 
+ARG FLASK_ENV
+ENV FLASK_ENV ${FLASK_ENV}
+
+ARG FLASK_DEBUG
+ENV FLASK_DEBUG ${FLASK_DEBUG}
+
 # Finally, we run uWSGI with the ini file we
 # created earlier
-CMD [ "uwsgi", "--ini", "app.ini" ]
+# CMD [ "uwsgi", "--ini", "app.ini" ]
+
+# For development environment only
+CMD [ "flask", "run" , "--host=0.0.0.0" ]

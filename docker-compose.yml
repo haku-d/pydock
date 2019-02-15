@@ -21,8 +21,12 @@ services:
       args:
         - APP_CODE_PATH_HOST
         - FLASK_APP
+        - FLASK_ENV
+        - FLASK_DEBUG
     volumes:
       - ${APP_CODE_PATH_HOST}:/app
+    ports:
+      - "5000:5000"
     networks:
       - default
   nginx:
